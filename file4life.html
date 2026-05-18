@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File 4 Life — Convert Anything, Keep It Forever</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =====================
+   TOKENS
+   ===================== */
+:root {
+  --blue:      #1a3fcc;
+  --blue-mid:  #2f5be0;
+  --blue-soft: #dce7ff;
+  --red:       #c82020;
+  --red-mid:   #e03535;
+  --red-soft:  #ffe0e0;
+  --cream:     #faf8f4;
+  --ink:       #181414;
+  --ink-2:     #3b3535;
+  --ink-3:     #7a706e;
+  --rule:      #e8e2da;
+  --shadow-blue: rgba(26,63,204,0.12);
+  --shadow-red:  rgba(200,32,32,0.10);
+  --ff-display: 'Fraunces', Georgia, serif;
+  --ff-body:    'DM Sans', sans-serif;
+  --radius:     18px;
+  --radius-sm:  10px;
+  --t:          0.32s cubic-bezier(.4,0,.2,1);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--ff-body);
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* =====================
+   LOADER
+   ===================== */
+#loader {
+  position: fixed; inset: 0;
+  background: var(--ink);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+#loader.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.loader-mark {
+  font-family: var(--ff-display);
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: -1px;
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: fadeIn .5s .3s forwards;
+}
+.loader-mark em { color: var(--red-mid); font-style: normal; }
+.loader-mark b  { color: var(--blue-mid); }
+
+.loader-track {
+  width: 180px; height: 3px;
+  background: rgba(255,255,255,.12);
+  border-radius: 99px; overflow: hidden;
+  opacity: 0; animation: fadeIn .4s .6s forwards;
+}
+.loader-fill {
+  height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--blue-mid), var(--red-mid));
+  border-radius: 99px;
+  animation: fillBar 1.8s .7s ease-out forwards;
+}
+.loader-note {
+  margin-top: 18px;
+  font-size: 13px;
+  color: rgba(255,255,255,.38);
+  letter-spacing: .04em;
+  opacity: 0; animation: fadeIn .4s .9s forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes fillBar { to { width: 100%; } }
+
+/* =====================
+   NAV
+   ===================== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  padding: 18px 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(250,248,244,.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+}
+.nav-logo {
+  font-family: var(--ff-display);
+  font-size: 24px; font-weight: 700;
+  color: var(--ink); text-decoration: none;
+  letter-spacing: -.5px;
+}
+.nav-logo em { color: var(--red); font-style: normal; }
+
+.nav-links {
+  display: flex; gap: 36px; list-style: none;
+}
+.nav-links a {
+  font-size: 14px; font-weight: 500;
+  color: var(--ink-3); text-decoration: none;
+  transition: color var(--t);
+}
+.nav-links a:hover { color: var(--ink); }
+
+.nav-cta {
+  padding: 10px 24px;
+  background: var(--red);
+  color: white; border: none; border-radius: 99px;
+  font-family: var(--ff-body); font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t), transform var(--t), box-shadow var(--t);
+  box-shadow: 0 3px 12px var(--shadow-red);
+}
+.nav-cta:hover {
+  background: var(--red-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--shadow-red);
+}
+
+/* =====================
+   HERO
+   ===================== */
+.hero {
+  padding: 160px 60px 120px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  max-width: 1280px; margin: 0 auto;
+  position: relative;
+}
+
+.hero-left { position: relative; }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 6px 16px;
+  background: var(--blue-soft);
+  border-radius: 99px;
+  font-size: 13px; font-weight: 600; color: var(--blue);
+  margin-bottom: 28px;
+  letter-spacing: .02em;
+}
+.hero-eyebrow::before {
+  content: '●';
+  color: var(--blue-mid);
+  font-size: 8px;
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.hero h1 {
+  font-family: var(--ff-display);
+  font-size: clamp(40px, 5.5vw, 70px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  color: var(--ink);
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--blue);
+}
+.hero h1 strong {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.hero-sub {
+  font-size: 18px; color: var(--ink-3);
+  max-width: 480px;
+  margin-bottom: 40px;
+  line-height: 1.7;
+}
+
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+.btn-blue {
+  padding: 16px 36px;
+  background: var(--blue);
+  color: white; border: none; border-radius: 99px;
+  font-family: var(--ff-body); font-size: 16px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--t);
+  box-shadow: 0 4px 20px var(--shadow-blue);
+}
+.btn-blue:hover {
+  background: var(--blue-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px var(--shadow-blue);
+}
+.btn-ghost {
+  padding: 16px 36px;
+  background: transparent;
+  color: var(--ink-2); border: 1.5px solid var(--rule);
+  border-radius: 99px;
+  font-family: var(--ff-body); font-size: 16px; font-weight: 500;
+  cursor: pointer;
+  transition: all var(--t);
+}
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
+
+.hero-note {
+  margin-top: 22px;
+  font-size: 13px; color: var(--ink-3);
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-note::before { content: '🔒'; }
+
+/* HERO RIGHT — upload mockup */
+.hero-right {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.upload-card {
+  background: white;
+  border: 1.5px dashed var(--blue-mid);
+  border-radius: var(--radius);
+  padding: 44px 36px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--t), background var(--t), transform var(--t);
+  position: relative; overflow: hidden;
+}
+.upload-card:hover {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  transform: translateY(-3px);
+}
+.upload-card::after {
+  content: 'or drag & drop here';
+  position: absolute; bottom: 16px; left: 0; right: 0;
+  font-size: 12px; color: var(--ink-3); letter-spacing: .02em;
+}
+.upload-icon {
+  font-size: 48px; margin-bottom: 14px;
+  display: block;
+  animation: bob 2.5s ease-in-out infinite;
+}
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.upload-card h3 {
+  font-family: var(--ff-display);
+  font-size: 22px; font-weight: 500;
+  color: var(--ink); margin-bottom: 6px;
+}
+.upload-card p { font-size: 14px; color: var(--ink-3); }
+
+.format-pills {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.pill {
+  padding: 8px 18px;
+  border-radius: 99px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--t);
+  border: 1.5px solid transparent;
+}
+.pill.blue { background: var(--blue-soft); color: var(--blue); border-color: #c2d4ff; }
+.pill.blue:hover { background: var(--blue); color: white; }
+.pill.red  { background: var(--red-soft); color: var(--red); border-color: #ffc4c4; }
+.pill.red:hover  { background: var(--red); color: white; }
+.pill.neutral { background: #f0ece6; color: var(--ink-2); border-color: var(--rule); }
+.pill.neutral:hover { background: var(--ink-2); color: white; }
+
+.conversion-demo {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.demo-file {
+  width: 48px; height: 56px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  color: white; flex-shrink: 0;
+}
+.demo-file.pdf  { background: var(--red); }
+.demo-file.docx { background: var(--blue); }
+.demo-arrow {
+  font-size: 22px; color: var(--ink-3); flex: 1; text-align: center;
+  animation: arrowPulse 1.5s ease-in-out infinite;
+}
+@keyframes arrowPulse { 0%,100%{transform:translateX(0)} 50%{transform:translateX(4px)} }
+.demo-meta h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.demo-meta p  { font-size: 13px; color: var(--ink-3); }
+.demo-badge {
+  margin-left: auto; flex-shrink: 0;
+  padding: 4px 12px; border-radius: 99px;
+  background: #e6faf0; color: #18a058;
+  font-size: 12px; font-weight: 700;
+}
+
+/* =====================
+   TRUST BAR
+   ===================== */
+.trust-bar {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  background: white;
+  padding: 40px 60px;
+}
+.trust-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.trust-stat {
+  text-align: center;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  transition: background var(--t);
+}
+.trust-stat:hover { background: var(--cream); }
+.trust-stat .num {
+  font-family: var(--ff-display);
+  font-size: 42px; font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.trust-stat .num.b { color: var(--blue); }
+.trust-stat .num.r { color: var(--red); }
+.trust-stat .lbl { font-size: 14px; color: var(--ink-3); }
+
+/* =====================
+   SERVICES
+   ===================== */
+.services {
+  padding: 120px 60px;
+  max-width: 1280px; margin: 0 auto;
+}
+
+.section-tag {
+  display: inline-block;
+  padding: 5px 14px;
+  background: var(--red-soft);
+  color: var(--red);
+  border-radius: 99px;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.section-tag.blue-tag {
+  background: var(--blue-soft); color: var(--blue);
+}
+
+.section-title {
+  font-family: var(--ff-display);
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 500;
+  letter-spacing: -1.5px;
+  margin-bottom: 16px; line-height: 1.1;
+}
+.section-sub {
+  font-size: 17px; color: var(--ink-3);
+  margin-bottom: 60px; max-width: 540px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.service-card {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  transition: all var(--t);
+  position: relative; overflow: hidden;
+  cursor: default;
+}
+.service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.09);
+  border-color: transparent;
+}
+.service-card.b:hover { box-shadow: 0 16px 40px var(--shadow-blue); }
+.service-card.r:hover { box-shadow: 0 16px 40px var(--shadow-red); }
+
+.service-stripe {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform var(--t);
+}
+.service-card:hover .service-stripe { transform: scaleX(1); }
+.service-stripe.b { background: var(--blue); }
+.service-stripe.r { background: var(--red); }
+
+.svc-icon { font-size: 32px; margin-bottom: 14px; display: block; }
+.svc-name { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.svc-desc { font-size: 13px; color: var(--ink-3); line-height: 1.5; margin-bottom: 14px; }
+.svc-fmts {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.fmt-chip {
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px; font-weight: 600;
+}
+.fmt-chip.b { background: var(--blue-soft); color: var(--blue); }
+.fmt-chip.r { background: var(--red-soft); color: var(--red); }
+.fmt-chip.n { background: #f0ece6; color: var(--ink-2); }
+
+.badge-popular {
+  position: absolute; top: 16px; right: 16px;
+  padding: 3px 10px;
+  background: var(--red); color: white;
+  border-radius: 99px; font-size: 10px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+
+/* =====================
+   HOW IT WORKS
+   ===================== */
+.how {
+  background: var(--ink);
+  padding: 120px 60px;
+  position: relative; overflow: hidden;
+}
+.how::before {
+  content: '';
+  position: absolute; top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26,63,204,.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.how::after {
+  content: '';
+  position: absolute; bottom: -80px; left: -80px;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,32,32,.28) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.how-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+.how .section-tag { background: rgba(255,255,255,.1); color: rgba(255,255,255,.7); }
+.how .section-title { color: white; }
+.how .section-sub { color: rgba(255,255,255,.55); }
+
+.steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 50px; position: relative;
+}
+.steps::before {
+  content: '';
+  position: absolute; top: 40px; left: calc(16.66% + 20px); right: calc(16.66% + 20px);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,.15) 0%, rgba(255,255,255,.4) 50%, rgba(255,255,255,.15) 100%);
+}
+
+.step { text-align: center; }
+.step-num {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-display);
+  font-size: 28px; font-weight: 700;
+  margin: 0 auto 28px;
+  position: relative; z-index: 1;
+}
+.step-num.b { background: var(--blue); color: white; box-shadow: 0 0 30px var(--shadow-blue); }
+.step-num.r { background: var(--red); color: white; box-shadow: 0 0 30px var(--shadow-red); }
+.step-num.w {
+  background: white; color: var(--ink);
+  box-shadow: 0 0 30px rgba(255,255,255,.15);
+}
+
+.step h3 { font-family: var(--ff-display); font-size: 24px; font-weight: 500; color: white; margin-bottom: 10px; }
+.step p  { font-size: 15px; color: rgba(255,255,255,.5); line-height: 1.65; }
+
+/* =====================
+   TESTIMONIALS
+   ===================== */
+.testimonials {
+  padding: 120px 60px;
+  max-width: 1280px; margin: 0 auto;
+}
+
+.testi-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.testi-card {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  transition: all var(--t);
+}
+.testi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,.07);
+}
+
+.testi-stars { font-size: 18px; margin-bottom: 18px; letter-spacing: 2px; }
+.testi-quote {
+  font-family: var(--ff-display);
+  font-size: 18px; font-weight: 400; font-style: italic;
+  line-height: 1.55; color: var(--ink-2);
+  margin-bottom: 24px;
+}
+.testi-author { display: flex; align-items: center; gap: 14px; }
+.testi-avi {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.testi-name { font-size: 15px; font-weight: 600; }
+.testi-role { font-size: 13px; color: var(--ink-3); }
+
+/* =====================
+   FAQ
+   ===================== */
+.faq {
+  background: var(--cream);
+  padding: 120px 60px;
+  border-top: 1px solid var(--rule);
+}
+.faq-inner {
+  max-width: 740px; margin: 0 auto;
+}
+
+.faq-list { display: flex; flex-direction: column; gap: 0; }
+
+.faq-item {
+  border-bottom: 1px solid var(--rule);
+}
+.faq-q {
+  width: 100%;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24px 0;
+  background: none; border: none;
+  font-family: var(--ff-body); font-size: 17px; font-weight: 500; color: var(--ink);
+  cursor: pointer; text-align: left;
+  gap: 20px;
+  transition: color var(--t);
+}
+.faq-q:hover { color: var(--blue); }
+.faq-icon {
+  width: 28px; height: 28px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--blue-soft);
+  color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 300;
+  transition: all var(--t);
+}
+.faq-item.open .faq-icon {
+  background: var(--blue); color: white; transform: rotate(45deg);
+}
+.faq-a {
+  max-height: 0; overflow: hidden;
+  transition: max-height .45s cubic-bezier(.4,0,.2,1), padding .45s ease;
+  font-size: 16px; color: var(--ink-3); line-height: 1.7;
+}
+.faq-item.open .faq-a { max-height: 300px; padding-bottom: 24px; }
+
+/* =====================
+   CTA BANNER
+   ===================== */
+.cta-banner {
+  padding: 100px 60px;
+  background: linear-gradient(135deg, var(--blue) 0%, #0d2aa0 50%, var(--red) 100%);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.cta-banner-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+.cta-banner h2 {
+  font-family: var(--ff-display);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 500; color: white;
+  letter-spacing: -1.5px;
+  margin-bottom: 18px; line-height: 1.1;
+}
+.cta-banner p { font-size: 18px; color: rgba(255,255,255,.75); margin-bottom: 40px; }
+.cta-banner .btn-white {
+  padding: 18px 44px;
+  background: white; color: var(--ink);
+  border: none; border-radius: 99px;
+  font-family: var(--ff-body); font-size: 17px; font-weight: 700;
+  cursor: pointer;
+  transition: all var(--t);
+  box-shadow: 0 8px 32px rgba(0,0,0,.2);
+}
+.cta-banner .btn-white:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+}
+
+/* =====================
+   FOOTER
+   ===================== */
+footer {
+  background: var(--ink);
+  padding: 60px 60px 40px;
+  color: rgba(255,255,255,.5);
+}
+.footer-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 40px; flex-wrap: wrap;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  margin-bottom: 30px;
+}
+.footer-brand .nav-logo { font-size: 28px; color: white; }
+.footer-brand .nav-logo em { color: var(--red-mid); }
+.footer-brand p { font-size: 13px; margin-top: 8px; max-width: 260px; line-height: 1.7; }
+.footer-links h4 { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.7); margin-bottom: 16px; }
+.footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links a { font-size: 14px; color: rgba(255,255,255,.45); text-decoration: none; transition: color var(--t); }
+.footer-links a:hover { color: white; }
+.footer-bottom { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; font-size: 13px; }
+
+/* =====================
+   SCROLL REVEAL
+   ===================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .65s ease, transform .65s ease;
+}
+.reveal.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+/* =====================
+   RESPONSIVE
+   ===================== */
+@media(max-width: 1024px) {
+  nav { padding: 16px 30px; }
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; padding: 120px 30px 80px; gap: 50px; }
+  .hero h1 { font-size: 44px; }
+  .hero-right { display: none; }
+  .trust-inner { grid-template-columns: repeat(2,1fr); }
+  .services-grid { grid-template-columns: repeat(2,1fr); }
+  .steps { grid-template-columns: 1fr; }
+  .steps::before { display: none; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .services, .testimonials, .how, .faq { padding: 80px 30px; }
+  .trust-bar, footer { padding: 40px 30px; }
+  .cta-banner { padding: 80px 30px; }
+  .footer-inner { flex-direction: column; gap: 40px; }
+  .footer-bottom { flex-direction: column; gap: 8px; }
+}
+@media(max-width: 600px) {
+  .trust-inner { grid-template-columns: 1fr 1fr; }
+  .services-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; }
+  .btn-blue, .btn-ghost { text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-mark">File<em>4</em><b>Life</b></div>
+  <div class="loader-track"><div class="loader-fill"></div></div>
+  <p class="loader-note">warming up the converters…</p>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">File<em>4</em>Life</a>
+  <ul class="nav-links">
+    <li><a href="#services">Formats</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <button class="nav-cta">Start Converting →</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left reveal">
+    <div class="hero-eyebrow">Free · Fast · No account needed</div>
+    <h1>
+      Convert <em>any file,</em><br>
+      keep it <strong>forever.</strong>
+    </h1>
+    <p class="hero-sub">
+      Drop your file, pick a format, done. No sign-ups, no watermarks, no drama — 
+      just clean conversions that actually work.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-blue">Upload a file →</button>
+      <button class="btn-ghost">See all formats</button>
+    </div>
+    <p class="hero-note">Your files are never stored. Deleted after 1 hour.</p>
+  </div>
+
+  <div class="hero-right reveal">
+    <div class="upload-card">
+      <span class="upload-icon">📂</span>
+      <h3>Drop your file here</h3>
+      <p>JPG, PNG, PDF, DOCX, MP4, MP3 and 40+ more</p>
+    </div>
+    <div class="format-pills">
+      <span class="pill blue">→ PDF</span>
+      <span class="pill red">→ MP3</span>
+      <span class="pill blue">→ DOCX</span>
+      <span class="pill neutral">→ PNG</span>
+      <span class="pill red">→ MP4</span>
+      <span class="pill neutral">→ ZIP</span>
+      <span class="pill blue">→ WebP</span>
+      <span class="pill neutral">→ FLAC</span>
+    </div>
+    <div class="conversion-demo">
+      <div class="demo-file pdf">PDF</div>
+      <div class="demo-arrow">→</div>
+      <div class="demo-meta">
+        <h4>report.pdf → report.docx</h4>
+        <p>Ready to edit in Word — instantly</p>
+      </div>
+      <div class="demo-badge">✓ Done</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar reveal">
+  <div class="trust-inner">
+    <div class="trust-stat">
+      <div class="num b">14M+</div>
+      <div class="lbl">Files converted</div>
+    </div>
+    <div class="trust-stat">
+      <div class="num r">40+</div>
+      <div class="lbl">Supported formats</div>
+    </div>
+    <div class="trust-stat">
+      <div class="num b">99.8%</div>
+      <div class="lbl">Uptime this year</div>
+    </div>
+    <div class="trust-stat">
+      <div class="num r">0</div>
+      <div class="lbl">Files ever stored</div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="reveal">
+    <div class="section-tag">All Formats</div>
+    <h2 class="section-title">Whatever you've got,<br>we've got the converter.</h2>
+    <p class="section-sub">Images, documents, video, audio, archives — all in one place, no switching tools.</p>
+  </div>
+
+  <div class="services-grid reveal">
+
+    <!-- Images -->
+    <div class="service-card b">
+      <div class="service-stripe b"></div>
+      <div class="badge-popular">Popular</div>
+      <span class="svc-icon">🖼️</span>
+      <div class="svc-name">Image Conversion</div>
+      <div class="svc-desc">Resize, reformat, and optimize images without losing quality.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip b">PNG</span>
+        <span class="fmt-chip b">JPG</span>
+        <span class="fmt-chip b">WebP</span>
+        <span class="fmt-chip b">GIF</span>
+        <span class="fmt-chip n">HEIC</span>
+        <span class="fmt-chip n">SVG</span>
+        <span class="fmt-chip n">BMP</span>
+        <span class="fmt-chip n">TIFF</span>
+      </div>
+    </div>
+
+    <!-- Documents -->
+    <div class="service-card r">
+      <div class="service-stripe r"></div>
+      <span class="svc-icon">📄</span>
+      <div class="svc-name">Document Conversion</div>
+      <div class="svc-desc">Switch between document formats while keeping your layout intact.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip r">PDF</span>
+        <span class="fmt-chip r">DOCX</span>
+        <span class="fmt-chip r">TXT</span>
+        <span class="fmt-chip n">RTF</span>
+        <span class="fmt-chip n">ODT</span>
+        <span class="fmt-chip n">EPUB</span>
+      </div>
+    </div>
+
+    <!-- Video -->
+    <div class="service-card b">
+      <div class="service-stripe b"></div>
+      <span class="svc-icon">🎬</span>
+      <div class="svc-name">Video Conversion</div>
+      <div class="svc-desc">Convert videos between formats for any device or platform.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip b">MP4</span>
+        <span class="fmt-chip b">MOV</span>
+        <span class="fmt-chip b">WebM</span>
+        <span class="fmt-chip n">AVI</span>
+        <span class="fmt-chip n">MKV</span>
+        <span class="fmt-chip n">FLV</span>
+      </div>
+    </div>
+
+    <!-- Audio -->
+    <div class="service-card r">
+      <div class="service-stripe r"></div>
+      <div class="badge-popular">Popular</div>
+      <span class="svc-icon">🎵</span>
+      <div class="svc-name">Audio Conversion</div>
+      <div class="svc-desc">High-quality audio conversions that preserve every note.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip r">MP3</span>
+        <span class="fmt-chip r">WAV</span>
+        <span class="fmt-chip r">FLAC</span>
+        <span class="fmt-chip n">AAC</span>
+        <span class="fmt-chip n">OGG</span>
+        <span class="fmt-chip n">AIFF</span>
+      </div>
+    </div>
+
+    <!-- Archives -->
+    <div class="service-card b">
+      <div class="service-stripe b"></div>
+      <span class="svc-icon">📦</span>
+      <div class="svc-name">Archive Formats</div>
+      <div class="svc-desc">Compress, extract, and repack archives of any flavor.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip b">ZIP</span>
+        <span class="fmt-chip b">RAR</span>
+        <span class="fmt-chip b">7Z</span>
+        <span class="fmt-chip n">TAR</span>
+        <span class="fmt-chip n">GZ</span>
+        <span class="fmt-chip n">BZ2</span>
+      </div>
+    </div>
+
+    <!-- Spreadsheets -->
+    <div class="service-card r">
+      <div class="service-stripe r"></div>
+      <span class="svc-icon">📊</span>
+      <div class="svc-name">Spreadsheets</div>
+      <div class="svc-desc">Move your data between Excel, Sheets, and open formats.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip r">XLSX</span>
+        <span class="fmt-chip r">CSV</span>
+        <span class="fmt-chip n">ODS</span>
+        <span class="fmt-chip n">TSV</span>
+        <span class="fmt-chip n">JSON</span>
+      </div>
+    </div>
+
+    <!-- Presentations -->
+    <div class="service-card b">
+      <div class="service-stripe b"></div>
+      <span class="svc-icon">📽️</span>
+      <div class="svc-name">Presentations</div>
+      <div class="svc-desc">Convert slides between PowerPoint, Keynote, and PDF.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip b">PPTX</span>
+        <span class="fmt-chip b">PDF</span>
+        <span class="fmt-chip n">KEY</span>
+        <span class="fmt-chip n">ODP</span>
+      </div>
+    </div>
+
+    <!-- RAW Photos -->
+    <div class="service-card r">
+      <div class="service-stripe r"></div>
+      <span class="svc-icon">📷</span>
+      <div class="svc-name">RAW Photos</div>
+      <div class="svc-desc">Convert camera RAW files to web-ready or print-ready formats.</div>
+      <div class="svc-fmts">
+        <span class="fmt-chip r">CR2</span>
+        <span class="fmt-chip r">NEF</span>
+        <span class="fmt-chip r">ARW</span>
+        <span class="fmt-chip n">DNG</span>
+        <span class="fmt-chip n">RAF</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="reveal">
+      <div class="section-tag">Simple as Sunday morning</div>
+      <h2 class="section-title" style="color:white">Three steps.<br>That's genuinely it.</h2>
+      <p class="section-sub">No tutorials. No settings rabbit holes. Just the thing working.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num b">1</div>
+        <h3>Drop your file</h3>
+        <p>Drag it over or click to browse. Works from your desktop, phone, Google Drive, or Dropbox.</p>
+      </div>
+      <div class="step">
+        <div class="step-num w">2</div>
+        <h3>Pick your format</h3>
+        <p>Choose from 40+ formats. We'll highlight which ones make sense for your file.</p>
+      </div>
+      <div class="step">
+        <div class="step-num r">3</div>
+        <h3>Download and go</h3>
+        <p>Your converted file is ready — usually in under 10 seconds. Download it and carry on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="reviews">
+  <div class="reveal">
+    <div class="section-tag blue-tag">Kind words from real people</div>
+    <h2 class="section-title">Folks seem to like it.</h2>
+    <p class="section-sub">We're just happy it helps.</p>
+  </div>
+  <div class="testi-grid reveal">
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"I've tried every file converter on the internet. This one just works without trying to sell me something every five seconds."</div>
+      <div class="testi-author">
+        <div class="testi-avi" style="background:#dce7ff">👩‍💻</div>
+        <div>
+          <div class="testi-name">Amara O.</div>
+          <div class="testi-role">Freelance Designer, Lagos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"Converted a 2GB video and it finished before I could even make a cup of tea. Genuinely impressed."</div>
+      <div class="testi-author">
+        <div class="testi-avi" style="background:#ffe0e0">🧑‍🎓</div>
+        <div>
+          <div class="testi-name">James R.</div>
+          <div class="testi-role">Film Student, Manchester</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"The fact that files are deleted after an hour actually made me trust it more. Finally someone who thought about this properly."</div>
+      <div class="testi-author">
+        <div class="testi-avi" style="background:#e6faf0">👨‍⚕️</div>
+        <div>
+          <div class="testi-name">Dr. Priya M.</div>
+          <div class="testi-role">GP & tech skeptic, Toronto</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"Sent my client a PDF instead of a Word doc by mistake. Converted it in 30 seconds. Nobody ever knew."</div>
+      <div class="testi-author">
+        <div class="testi-avi" style="background:#fff3dc">👩‍💼</div>
+        <div>
+          <div class="testi-name">Sofia B.</div>
+          <div class="testi-role">Account Manager, Berlin</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"Our whole podcast workflow runs through this. FLAC to MP3 every episode, totally dependable every single time."</div>
+      <div class="testi-author">
+        <div class="testi-avi" style="background:#f0e6ff">🎙️</div>
+        <div>
+          <div class="testi-name">Marcus & Tia</div>
+          <div class="testi-role">Podcast hosts, Atlanta</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"I teach at a school where we get files in every format imaginable. File4Life has genuinely saved my Mondays."</div>
+      <div class="testi-author">
+        <div class="testi-avi" style="background:#dce7ff">🧑‍🏫</div>
+        <div>
+          <div class="testi-name">Mr. Chen</div>
+          <div class="testi-role">Secondary School Teacher, Auckland</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="faq-inner">
+    <div class="reveal">
+      <div class="section-tag">FAQ</div>
+      <h2 class="section-title">The questions everyone<br>thinks but doesn't ask.</h2>
+      <p class="section-sub" style="margin-bottom:48px">Real answers. No fluff.</p>
+    </div>
+    <div class="faq-list reveal">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Is it really free?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Yes, genuinely. No hidden tiers, no "convert 3 files then pay" nonsense. 
+          Basic conversions are free forever. If we ever add a paid plan, it'll be optional extras — not a paywall in front of the thing that already works.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What happens to my files?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Your files live on our servers for exactly 1 hour after conversion — just long enough for you to download. 
+          After that, they're permanently deleted. We don't read them, we don't store them, we definitely don't sell them. 
+          They're yours, not ours.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          How big can my files be?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Up to 500MB on the free plan. Need to convert something bigger? 
+          Get in touch and we'll sort it out — we're reasonable people.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Will the quality be the same?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          We don't compress or degrade files unless you ask us to. 
+          For formats that are inherently lossy (like converting FLAC to MP3), you'll get the highest-quality settings by default. 
+          We'll always tell you if there's a quality trade-off.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Do I need to make an account?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          No account, no email, no nothing. Just come and convert. 
+          We figure if you've got a file to convert, the last thing you need is a sign-up form.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Can I convert multiple files at once?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Yes — you can batch convert up to 10 files at once. 
+          Drop them all in, set the output format, and they'll all convert in parallel.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What if my converted file looks wrong?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Hit the feedback button on the result page and tell us exactly what went wrong. 
+          We actually read these. Weird edge cases are how we get better.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Is it safe to convert sensitive documents?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          All uploads use HTTPS encryption in transit, and files are processed in isolated environments. 
+          That said, for anything highly sensitive (medical records, legal documents), we'd always recommend 
+          using a local tool — and we'll be upfront that we're a web service, not a vault.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<div class="cta-banner reveal">
+  <div class="cta-banner-inner">
+    <h2>Go on then.<br>Drop a file.</h2>
+    <p>No account. No fuss. Just your file, the format you want, and a download button waiting for you.</p>
+    <button class="btn-white">Upload your first file →</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-logo" href="#">File<em>4</em>Life</a>
+      <p>Honest, simple file conversion. Built for humans, not enterprise dashboards.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Convert</h4>
+      <ul>
+        <li><a href="#">Images</a></li>
+        <li><a href="#">Documents</a></li>
+        <li><a href="#">Video</a></li>
+        <li><a href="#">Audio</a></li>
+        <li><a href="#">Archives</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Status</a></li>
+        <li><a href="#">Feedback</a></li>
+        <li><a href="#">API (coming soon)</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 File4Life. Made with care.</span>
+    <span>Files deleted within 1 hour. Always.</span>
+  </div>
+</footer>
+
+<script>
+/* LOADER */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('gone');
+  }, 2200);
+});
+
+/* FAQ TOGGLE */
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* SCROLL REVEAL */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
